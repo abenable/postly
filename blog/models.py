@@ -2,6 +2,7 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 from django.urls import reverse
+from django.utils.text import slugify
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
@@ -14,6 +15,19 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            # Only set the slug if it's not already set
+            base_slug = slugify(self.name)
+            unique_slug = base_slug
+            counter = 1
+            # Ensure slug is unique
+            while Category.objects.filter(slug=unique_slug).exists():
+                unique_slug = f"{base_slug}-{counter}"
+                counter += 1
+            self.slug = unique_slug
+        super().save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse('blog:category_detail', kwargs={'slug': self.slug})
@@ -43,6 +57,19 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            # Only set the slug if it's not already set
+            base_slug = slugify(self.title)
+            unique_slug = base_slug
+            counter = 1
+            # Ensure slug is unique
+            while Post.objects.filter(slug=unique_slug).exists():
+                unique_slug = f"{base_slug}-{counter}"
+                counter += 1
+            self.slug = unique_slug
+        super().save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse('blog:post_detail', kwargs={'slug': self.slug})
