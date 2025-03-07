@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      {% block title %}Postly - A Modern Blog Platform{% endblock %}
+    </title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    {% block extra_css %}{% endblock %}
+  </head>
+  <body>
+    <header class="bg-dark text-white py-3">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6">
+            <h1 class="mb-0">
+              <a href="/" class="text-white text-decoration-none">Postly</a>
+            </h1>
+          </div>
+          <div class="col-md-6 d-flex justify-content-end align-items-center">
+            <nav>
+              <ul class="nav">
+                <li class="nav-item">
+                  <a class="nav-link text-white" href="/">Home</a>
+                </li>
+                {% if user.is_authenticated %}
+                <li class="nav-item">
+                  <a class="nav-link text-white" href="{% url 'user:profile' %}"
+                    >Profile</a
+                  >
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link text-white" href="{% url 'user:logout' %}"
+                    >Logout</a
+                  >
+                </li>
+                {% else %}
+                <li class="nav-item">
+                  <a class="nav-link text-white" href="{% url 'user:login' %}"
+                    >Login</a
+                  >
+                </li>
+                <li class="nav-item">
+                  <a
+                    class="nav-link text-white"
+                    href="{% url 'user:register' %}"
+                    >Register</a
+                  >
+                </li>
+                {% endif %}
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="container py-4">
+      {% if messages %}
+      <div class="messages">
+        {% for message in messages %}
+        <div
+          class="alert alert-{{ message.tags }} alert-dismissible fade show"
+          role="alert"
+        >
+          {{ message }}
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Close"
+          ></button>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %} {% block content %} {% endblock %}
+    </main>
+
+    <footer class="bg-dark text-white py-4">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6">
+            <p>&copy; {% now "Y" %} Postly. All rights reserved.</p>
+          </div>
+          <div class="col-md-6 text-end">
+            <p>A modern blog platform</p>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+  </body>
+</html>
