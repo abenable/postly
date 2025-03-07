@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os  # Add missing import for os module
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,9 +28,32 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# Security Settings - Note: Some settings are disabled in development
+# SECURITY: Browser-side security enhancements
+SECURE_BROWSER_XSS_FILTER = True  # Enables browser's XSS filtering protection
+SECURE_CONTENT_TYPE_NOSNIFF = True  # Prevents browser from trying to guess content types
+X_FRAME_OPTIONS = 'DENY'  # Prevents clickjacking by denying all framing of this site
+
+# SECURITY: The following settings require HTTPS - disabled during development
+# Uncomment for production or when using HTTPS in development
+# CSRF_COOKIE_SECURE = True  # Ensures CSRF cookies are only sent over HTTPS
+# SESSION_COOKIE_SECURE = True  # Ensures session cookies are only sent over HTTPS
+# SECURE_SSL_REDIRECT = True  # Forces all connections to use HTTPS instead of HTTP
+# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# SECURE_HSTS_SECONDS = 31536000  # 1 year
+# SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+# SECURE_HSTS_PRELOAD = True
+
+# Content Security Policy - requires django-csp package
+# Temporarily commenting out CSP settings until we can resolve the django_csp import issue
+# CSP_DEFAULT_SRC = ("'self'",)
+# CSP_STYLE_SRC = ("'self'", "'unsafe-inline'")
+# CSP_SCRIPT_SRC = ("'self'",)
+# CSP_IMG_SRC = ("'self'",)
+# CSP_FONT_SRC = ("'self'",)
+
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -37,6 +61,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'blog',
+    'user',
+    # Temporarily removing django_csp from installed apps
+    # 'django_csp',
 ]
 
 MIDDLEWARE = [
@@ -47,6 +75,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # Temporarily removing django_csp middleware
+    # 'django_csp.middleware.CSPMiddleware',
 ]
 
 ROOT_URLCONF = 'postly.urls'
@@ -54,7 +84,7 @@ ROOT_URLCONF = 'postly.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],  # Add templates directory
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -120,8 +150,35 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Media files (Uploaded files)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Authentication settings
+LOGIN_REDIRECT_URL = 'blog:home'  # Updated to use blog app
+LOGOUT_REDIRECT_URL = 'user:login'
+LOGIN_URL = 'user:login'
+
+AUTH_USER_MODEL = 'user.User'
+
+# Email settings
+# During development, use console backend to see emails in console
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# For production, uncomment and configure these settings:
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.example.com'  # e.g., smtp.gmail.com
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = 'your-email@example.com'
+# EMAIL_HOST_PASSWORD = 'your-email-password'
+# DEFAULT_FROM_EMAIL = 'Postly <noreply@example.com>'
+
