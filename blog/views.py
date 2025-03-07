@@ -3,6 +3,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
 from django.contrib import messages
+from django.utils.text import slugify
 from .models import Post, Category, Comment
 from django.db.models import Q
 
@@ -95,3 +96,4 @@ def add_comment(request, slug):
             messages.success(request, 'Comment added successfully!')
         return redirect('blog:post_detail', slug=slug)
     return redirect('blog:post_detail', slug=slug)
+
