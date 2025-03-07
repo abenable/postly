@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}{{ category.name }} - Postly{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col">
+            <h1>{{ category.name }}</h1>
+            <p class="text-muted">{{ posts.count }} posts in this category</p>
+        </div>
+    </div>
+
+    <div class="row">
+        {% if posts %}
+            {% for post in posts %}
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    {% if post.featured_image %}
+                    <img src="{{ post.featured_image.url }}" class="card-img-top" alt="{{ post.title }}">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ post.title }}</h5>
+                        <p class="card-text">{{ post.content|truncatewords:30 }}</p>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">By {{ post.author.get_full_name|default:post.author.email }}</small>
+                            <small class="text-muted">{{ post.published_at|date:"M d, Y" }}</small>
+                        </div>
+                        <a href="{% url 'blog:post_detail' post.slug %}" class="btn btn-primary mt-2">Read More</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col">
+                <p>No posts found in this category.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="row mt-4">
+        <div class="col">
+            <a href="{% url 'blog:category_list' %}" class="btn btn-secondary">Back to Categories</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

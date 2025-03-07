@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block title %}{{ post.title }} - Postly{% endblock %}
+
+{% block content %}
+<div class="container">
+    <article class="blog-post">
+        {% if post.featured_image %}
+        <div class="featured-image mb-4">
+            <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="img-fluid rounded">
+        </div>
+        {% endif %}
+
+        <header class="blog-post-header mb-4">
+            <h1 class="blog-post-title">{{ post.title }}</h1>
+            <div class="blog-post-meta text-muted">
+                <span>By {{ post.author.get_full_name|default:post.author.email }}</span>
+                <span class="mx-2">|</span>
+                <span>{{ post.published_at|date:"F j, Y" }}</span>
+                <span class="mx-2">|</span>
+                <a href="{% url 'blog:category_detail' post.category.slug %}" class="text-decoration-none">
+                    {{ post.category.name }}
+                </a>
+            </div>
+        </header>
+
+        <div class="blog-post-content mb-5">
+            {{ post.content|linebreaks }}
+        </div>
+
+        {% if user == post.author %}
+        <div class="blog-post-actions mb-5">
+            <a href="{% url 'blog:post_update' post.slug %}" class="btn btn-primary">Edit Post</a>
+            <a href="{% url 'blog:post_delete' post.slug %}" class="btn btn-danger">Delete Post</a>
+        </div>
+        {% endif %}
+
+        <section class="comments mt-5">
+            <h3>Comments</h3>
+            {% if user.is_authenticated %}
+            <form method="post" action="{% url 'blog:add_comment' post.slug %}" class="mb-4">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="content" class="form-label">Add a comment</label>
+                    <textarea name="content" id="content" class="form-control" rows="3" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Post Comment</button>
+            </form>
+            {% else %}
+            <div class="alert alert-info">
+                Please <a href="{% url 'user:login' %}">login</a> to post comments.
+            </div>
+            {% endif %}
+
+            <div class="comments-list">
+                {% for comment in post.comments.all %}
+                {% if comment.active %}
+                <div class="comment card mb-3">
+                    <div class="card-body">
+                        <p class="comment-content mb-2">{{ comment.content }}</p>
+                        <div class="comment-meta text-muted">
+                            <small>By {{ comment.author.get_full_name|default:comment.author.email }}</small>
+                            <small class="mx-2">|</small>
+                            <small>{{ comment.created_at|date:"F j, Y" }}</small>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% empty %}
+                <p>No comments yet.</p>
+                {% endfor %}
+            </div>
+        </section>
+    </article>
+</div>
+{% endblock %}

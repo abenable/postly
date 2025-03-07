@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Categories - Postly{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">Categories</h1>
+    
+    <div class="row">
+        {% if categories %}
+            {% for category in categories %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ category.name }}</h5>
+                        <p class="card-text text-muted">
+                            {{ category.posts.count }} posts
+                        </p>
+                        <a href="{% url 'blog:category_detail' category.slug %}" class="btn btn-primary">View Posts</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col">
+                <p>No categories found.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
