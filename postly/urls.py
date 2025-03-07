@@ -20,8 +20,9 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('', include('user.urls')),
     path('admin/', admin.site.urls),
+    path('user/', include('user.urls')),
+    path('', include('blog.urls')),
 ]
 
 # Add media URL configuration if settings contains MEDIA_URL and MEDIA_ROOT
