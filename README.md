@@ -44,7 +44,7 @@ Postly is a robust Django-based web application that provides a modern blogging 
 1. Clone the repository:
 
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/abenable/postly
    cd postly
    ```
 
