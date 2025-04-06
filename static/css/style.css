@@ -1,6 +1,21 @@
 /* Global Styles */
+html {
+    position: relative;
+    min-height: 100%;
+}
+
 body {
     background-color: #f8f9fa;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+}
+
+main.container {
+    flex: 1 0 auto;
+    width: 100%;
+    padding-bottom: 2rem;
 }
 
 /* Blog Post Cards */
@@ -75,11 +90,6 @@ body {
 .page-item.active .page-link {
     background-color: #007bff;
     border-color: #007bff;
-}
-
-/* Footer */
-footer {
-    margin-top: auto;
 }
 
 /* Responsive Design */

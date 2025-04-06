@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -74,7 +74,7 @@ def logout_user(request):
 @login_required
 def user_profile(request):
     if request.method == 'POST':
-        form = UserUpdateForm(request.POST, instance=request.user)
+        form = UserUpdateForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
             form.save()
             messages.success(request, 'Your profile has been updated successfully.')
@@ -85,6 +85,21 @@ def user_profile(request):
         form = UserUpdateForm(instance=request.user)
     
     return render(request, 'user/profile.html', {'form': form})
+
+@login_required
+def follow_user(request, user_id):
+    user_to_follow = get_object_or_404(User, id=user_id)
+    if request.user != user_to_follow:
+        request.user.follow(user_to_follow)
+        messages.success(request, f'You are now following {user_to_follow.get_full_name() or user_to_follow.email}')
+    return redirect('user:profile')
+
+@login_required
+def unfollow_user(request, user_id):
+    user_to_unfollow = get_object_or_404(User, id=user_id)
+    request.user.unfollow(user_to_unfollow)
+    messages.success(request, f'You have unfollowed {user_to_unfollow.get_full_name() or user_to_unfollow.email}')
+    return redirect('user:profile')
 
 # Custom Password Reset Views
 class CustomPasswordResetView(PasswordResetView):

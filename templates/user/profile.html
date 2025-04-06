@@ -1,52 +1,91 @@
 {% extends 'base.html' %} {% block title %}My Profile - Postly{% endblock %} 
 {% block content %}
 <div class="row">
-  <div class="col-md-8 offset-md-2">
+  <div class="col-md-4">
+    <div class="card mb-4">
+      <div class="card-body text-center">
+        {% if user.profile_picture %}
+          <img src="{{ user.profile_picture.url }}" alt="Profile Picture" class="rounded-circle img-fluid mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+        {% else %}
+          <img src="https://via.placeholder.com/150" alt="Default Profile" class="rounded-circle img-fluid mb-3">
+        {% endif %}
+        <h4 class="mb-0">{{ user.get_full_name|default:user.email }}</h4>
+        <p class="text-muted">{{ user.bio|default:"No bio added yet." }}</p>
+        <div class="d-flex justify-content-center mb-2">
+          <div class="px-3">
+            <h6 class="mb-0">{{ user.following.count }}</h6>
+            <small class="text-muted">Following</small>
+          </div>
+          <div class="px-3">
+            <h6 class="mb-0">{{ user.followers.count }}</h6>
+            <small class="text-muted">Followers</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-8">
     <div class="card mb-4">
       <div class="card-header bg-primary text-white">
-        <h3 class="card-title mb-0">My Profile</h3>
+        <h3 class="card-title mb-0">Edit Profile</h3>
       </div>
       <div class="card-body">
-        <form method="post" novalidate>
+        <form method="post" enctype="multipart/form-data" novalidate>
           {% csrf_token %}
 
           <div class="mb-3">
-            <label for="{{ form.email.id_for_label }}" class="form-label"
-              >Email</label
-            >
-            {{ form.email }} {% if form.email.errors %}
+            <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+            {{ form.email }}
+            {% if form.email.errors %}
             <div class="text-danger">
-              {% for error in form.email.errors %} {{ error }} {% endfor %}
+              {% for error in form.email.errors %}{{ error }}{% endfor %}
             </div>
             {% endif %}
           </div>
 
           <div class="mb-3">
-            <label for="{{ form.first_name.id_for_label }}" class="form-label"
-              >First Name</label
-            >
-            {{ form.first_name }} {% if form.first_name.errors %}
+            <label for="{{ form.first_name.id_for_label }}" class="form-label">First Name</label>
+            {{ form.first_name }}
+            {% if form.first_name.errors %}
             <div class="text-danger">
-              {% for error in form.first_name.errors %} {{ error }} {% endfor %}
+              {% for error in form.first_name.errors %}{{ error }}{% endfor %}
             </div>
             {% endif %}
           </div>
 
           <div class="mb-3">
-            <label for="{{ form.last_name.id_for_label }}" class="form-label"
-              >Last Name</label
-            >
-            {{ form.last_name }} {% if form.last_name.errors %}
+            <label for="{{ form.last_name.id_for_label }}" class="form-label">Last Name</label>
+            {{ form.last_name }}
+            {% if form.last_name.errors %}
             <div class="text-danger">
-              {% for error in form.last_name.errors %} {{ error }} {% endfor %}
+              {% for error in form.last_name.errors %}{{ error }}{% endfor %}
             </div>
             {% endif %}
           </div>
 
           <div class="mb-3">
-            <button type="submit" class="btn btn-primary">
-              Update Profile
-            </button>
+            <label for="{{ form.profile_picture.id_for_label }}" class="form-label">Profile Picture</label>
+            {{ form.profile_picture }}
+            {% if form.profile_picture.errors %}
+            <div class="text-danger">
+              {% for error in form.profile_picture.errors %}{{ error }}{% endfor %}
+            </div>
+            {% endif %}
+          </div>
+
+          <div class="mb-3">
+            <label for="{{ form.bio.id_for_label }}" class="form-label">Bio</label>
+            {{ form.bio }}
+            {% if form.bio.errors %}
+            <div class="text-danger">
+              {% for error in form.bio.errors %}{{ error }}{% endfor %}
+            </div>
+            {% endif %}
+          </div>
+
+          <div class="mb-3">
+            <button type="submit" class="btn btn-primary">Update Profile</button>
           </div>
         </form>
       </div>
@@ -58,14 +97,76 @@
       </div>
       <div class="card-body">
         <div class="mb-3">
-          <a
-            href="{% url 'user:password_change' %}"
-            class="btn btn-outline-secondary"
-            >Change Password</a
-          >
+          <a href="{% url 'user:password_change' %}" class="btn btn-outline-secondary">Change Password</a>
         </div>
       </div>
     </div>
   </div>
 </div>
+
+{% if user.following.exists or user.followers.exists %}
+<div class="row mt-4">
+  {% if user.following.exists %}
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <h4 class="mb-0">Following</h4>
+      </div>
+      <div class="card-body">
+        <div class="list-group">
+          {% for following_user in user.following.all %}
+          <div class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+              {% if following_user.profile_picture %}
+                <img src="{{ following_user.profile_picture.url }}" alt="Profile" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">
+              {% else %}
+                <img src="https://via.placeholder.com/40" alt="Default Profile" class="rounded-circle">
+              {% endif %}
+              <span class="ms-2">{{ following_user.get_full_name|default:following_user.email }}</span>
+            </div>
+            <form method="post" action="{% url 'user:unfollow' following_user.id %}">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-sm btn-outline-danger">Unfollow</button>
+            </form>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if user.followers.exists %}
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <h4 class="mb-0">Followers</h4>
+      </div>
+      <div class="card-body">
+        <div class="list-group">
+          {% for follower in user.followers.all %}
+          <div class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+              {% if follower.profile_picture %}
+                <img src="{{ follower.profile_picture.url }}" alt="Profile" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">
+              {% else %}
+                <img src="https://via.placeholder.com/40" alt="Default Profile" class="rounded-circle">
+              {% endif %}
+              <span class="ms-2">{{ follower.get_full_name|default:follower.email }}</span>
+            </div>
+            {% if user.is_following != follower %}
+            <form method="post" action="{% url 'user:follow' follower.id %}">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-sm btn-outline-primary">Follow Back</button>
+            </form>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endif %}
 {% endblock %}

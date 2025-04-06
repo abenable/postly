@@ -36,10 +36,15 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(default=timezone.now)
     
+    # New fields
+    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
+    bio = models.TextField(max_length=500, blank=True)
+    followers = models.ManyToManyField('self', symmetrical=False, related_name='following', blank=True)
+    
     objects = UserManager()
     
-    USERNAME_FIELD = 'email'  # Email will be used for authentication instead of username
-    REQUIRED_FIELDS = []  # Email is already required by default
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
     
     def get_full_name(self):
         """Return the full name of the user."""
@@ -52,3 +57,16 @@ class User(AbstractBaseUser, PermissionsMixin):
     
     def __str__(self):
         return self.email
+        
+    def follow(self, user):
+        """Follow a user if not already following"""
+        if user != self:
+            self.following.add(user)
+    
+    def unfollow(self, user):
+        """Unfollow a user if following"""
+        self.following.remove(user)
+    
+    def is_following(self, user):
+        """Check if following a specific user"""
+        return self.following.filter(id=user.id).exists()

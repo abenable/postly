@@ -1,6 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-100">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -18,7 +18,7 @@
     <link href="{% static 'css/style.css' %}" rel="stylesheet">
     {% block extra_css %}{% endblock %}
   </head>
-  <body>
+  <body class="d-flex flex-column h-100">
     <header class="bg-dark text-white py-3">
       <div class="container">
         <div class="row">
@@ -70,28 +70,30 @@
       </div>
     </header>
 
-    <main class="container py-4">
-      {% if messages %}
-      <div class="messages">
-        {% for message in messages %}
-        <div
-          class="alert alert-{{ message.tags }} alert-dismissible fade show"
-          role="alert"
-        >
-          {{ message }}
-          <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="alert"
-            aria-label="Close"
-          ></button>
+    <main class="flex-shrink-0 flex-grow-1">
+      <div class="container py-4">
+        {% if messages %}
+        <div class="messages">
+          {% for message in messages %}
+          <div
+            class="alert alert-{{ message.tags }} alert-dismissible fade show"
+            role="alert"
+          >
+            {{ message }}
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="alert"
+              aria-label="Close"
+            ></button>
+          </div>
+          {% endfor %}
         </div>
-        {% endfor %}
+        {% endif %} {% block content %} {% endblock %}
       </div>
-      {% endif %} {% block content %} {% endblock %}
     </main>
 
-    <footer class="bg-dark text-white py-4">
+    <footer class="footer mt-auto py-4 bg-dark text-white">
       <div class="container">
         <div class="row">
           <div class="col-md-6">
